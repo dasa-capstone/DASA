@@ -13,7 +13,6 @@ Be respectful and critique code, not people. We follow the OSU Student Code of C
 ```bash
 git clone https://github.com/dasa-capstone/DASA.git
 cd DASA
-cp .env.example .env   # local secrets only; never commit .env
 ```
 
 **Still to decide as a team (Sprint 1):** the language version, package manager, PX4 version, and how the simulator runs (container or local install). Once decided, record the choice in `docs/adr/0001-dev-environment.md` and put the full setup, starting from Suresh's existing instructions, in `docs/setup.md`. Owners: Gabriel Simek (ADR) and Brendon Wong (setup doc).
@@ -89,7 +88,7 @@ Workflows live in `.github/workflows/`. Planned jobs: `trello-sync` to keep Trel
 
 ## Security & Secrets
 
-- No credentials, API keys, or `.env` files in the repository. `.env.example` lists what's needed.
+- No credentials, API keys, or `.env` files in the repository.
 - Report a leaked secret or vulnerability privately to the Quality Owner, not in a public issue. A leaked key gets revoked, not just deleted.
 - What may go into AI tools follows the AI and Confidentiality section of the charter and `AGENTS.md`.
 - Attack and failure experiments run only inside the simulation environment.
