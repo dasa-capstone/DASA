@@ -16,7 +16,7 @@ cd DASA
 cp .env.example .env   # local secrets only; never commit .env
 ```
 
-**Still to decide as a team (Sprint 1):** the language version, package manager, PX4 version, and how the simulator runs (container or local install). The choice is recorded in `docs/adr/0001-dev-environment.md` and the full setup, starting from Suresh's existing instructions, goes in `docs/setup.md`. Owners: Gabriel Simek (ADR) and Brendon Wong (setup doc).
+**Still to decide as a team (Sprint 1):** the language version, package manager, PX4 version, and how the simulator runs (container or local install). Once decided, record the choice in `docs/adr/0001-dev-environment.md` and put the full setup, starting from Suresh's existing instructions, in `docs/setup.md`. Owners: Gabriel Simek (ADR) and Brendon Wong (setup doc).
 
 ## Branching & Workflow
 
