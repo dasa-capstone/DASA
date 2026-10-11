@@ -27,7 +27,7 @@ cp .env.example .env   # local secrets only; never commit .env
 ## Issues & Planning
 
 - Every task is a Trello card with one owner, an expected outcome, and a due date.
-- Every PR links its Trello card in the description. The `trello-sync` workflow then attaches the PR to the card, moves the card to Review when the PR is ready, and to Done when it merges. Small chores with no card get the `no-card` label.
+- Every PR links its Trello card in the description. Small chores with no card get the `no-card` label. Until the planned `trello-sync` workflow lands (Sprint 1), move cards to Review and Done by hand; after that it attaches the PR to the card and moves the card as the PR progresses.
 - Bugs and setup problems are GitHub Issues.
 - Cards are sized to finish in two or three days; bigger ones get split.
 
@@ -85,7 +85,7 @@ Formatter runs, lockfile bumps, and generated files don't count on their own. To
 
 ## CI/CD
 
-Workflows live in `.github/workflows/`. `trello-sync` keeps Trello cards in step with PRs. Planned jobs: `lint`, `test`, and secret scanning (Sprint 1), then a scheduled simulation smoke test (Sprint 2–3). Results and re-runs are in the PR's **Checks** tab. A check that keeps failing for no clear reason goes to the Quality Owner.
+Workflows live in `.github/workflows/`. Planned jobs: `trello-sync` to keep Trello cards in step with PRs, `lint`, `test`, and secret scanning (Sprint 1), then a scheduled simulation smoke test (Sprint 2–3). Results and re-runs are in the PR's **Checks** tab. A check that keeps failing for no clear reason goes to the Quality Owner.
 
 ## Security & Secrets
 
