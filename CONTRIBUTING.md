@@ -8,7 +8,7 @@ Be respectful and critique code, not people. We follow the OSU Student Code of C
 
 ## Getting Started
 
-**Prerequisites:** Git, access to `dasa-capstone/DASA`, and Docker for the PX4 simulation.
+**Prerequisites:** Git and access to `dasa-capstone/DASA`. What the PX4 simulation needs (Docker or a local install) is still open; see below.
 
 ```bash
 git clone https://github.com/dasa-capstone/DASA.git
