@@ -31,3 +31,9 @@ runs/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Local handover packet (contains the sponsor's doc and meeting notes; never committed)
+handover/
+
+# Run output
+/results/

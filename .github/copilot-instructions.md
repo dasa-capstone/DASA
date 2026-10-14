@@ -1,11 +1,13 @@
 # Copilot review instructions
 
-Project context and rules are in `AGENTS.md` and `CONTRIBUTING.md`. When reviewing pull requests, focus on:
+Project context is in `AGENTS.md` and `CONTRIBUTING.md`. When reviewing, focus on:
 
-- Verifier logic: PASS only with clear evidence, FAIL only with evidence of a violation, INCONCLUSIVE when evidence is missing or unreadable. Flag anything that passes by default or hides errors.
+- Verifier logic: PASS only with clear evidence, FAIL only with evidence of a violation, INCONCLUSIVE when evidence is missing. Flag anything that passes by default or swallows errors.
+- The harness reporting mission success. It reports run status only; verdicts belong to the verifier.
 - Missing tests for new logic, especially FAIL and INCONCLUSIVE cases.
-- Unseeded randomness and experiments without a run record.
-- Inconsistent units or hard-coded tolerances.
-- Secrets, keys, `.env` contents, or anything resembling partner data.
+- Claims in the PR that something works without the command output to show it.
+- Hard-coded tolerances, mixed units, unseeded randomness, experiments without a run record.
+- Container config that publishes ports beyond `127.0.0.1` or uses host networking.
+- Secrets, `.env` contents, or anything resembling partner data.
 
-Skip formatting and minor naming comments. Keep comments short, and mark optional ones "nit:".
+Skip formatting and naming comments. Keep comments short; mark optional ones "nit:".

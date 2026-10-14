@@ -1,69 +1,88 @@
 # AGENTS.md
 
-Context for AI coding agents working in this repository. Keep it short: a line belongs here only if removing it would cause a mistake. People should read `README.md` and `CONTRIBUTING.md`.
+Context for AI coding agents working in this repository. Keep it short: a line belongs here only if removing it would cause a mistake. People should read `README.md` and `CONTRIBUTING.md`. How we run agent work (briefs, small PRs, evidence) is in `docs/agent-workflow.md`.
 
 ## Project
 
-DASA is a research project on whether AI-generated software diversity reduces attack transferability in autonomous systems. We use PX4 flight software in simulation.
+DASA asks whether AI-generated software diversity reduces attack transferability in autonomous systems while preserving mission behavior. PX4 flight software in simulation is the test subject.
 
-- **Pipeline:** mission spec → PX4 SITL (Gazebo) → `.ulg` flight log → verifier → PASS / FAIL / INCONCLUSIVE.
-- **Workstreams:** Red builds controlled failure and attack scenarios. Blue generates diversified variants that must still pass the verifier.
-- **Docs:**
-  - Requirements: `docs/requirements.md`
-  - Design: `docs/design.md`
-  - Decisions: `docs/adr/`
-  - Risks: `docs/risks.md`. Flag new risks there, but don't edit it.
-- **Definition of Done and review rules:** `CONTRIBUTING.md`
+- **Pipeline:** mission spec → PX4 SITL → `.ulg` flight log → verifier → PASS / FAIL / INCONCLUSIVE.
+- **Variants are modified PX4 source**, built from a pinned commit. The baseline is the unmodified build.
+- **PX4 is a stand-in**, chosen because it is open source. Variant generation and differential testing must not depend on PX4 specifics; PX4-specific code lives behind a small adapter.
+- **The harness reports how a run went** (completed, failed, timed out). Only the verifier decides whether the mission passed.
+- **Workstreams:** Red builds controlled failure and attack scenarios. Blue generates variants that must still pass the verifier.
+- **Source of truth:** the team's project-plan Google Doc (not in this repo) for scope and decisions; ADRs in `docs/adr/` for technical decisions. If they disagree with this file, say so in the PR.
 
 ## Commands
 
-Not set yet. The toolchain is decided in `docs/adr/0001-dev-environment.md` (Sprint 1, owner: Gabriel). Add the install, test, lint, and run-a-mission commands here exactly as typed, plus one command that runs every check.
+```sh
+make hooks   # once per clone
+make check   # what CI runs; must pass before a PR
+make test    # fast tests only
+make help
+```
+
+Environment targets (build, run a mission) are added by the environment PR; list them here when they land. Simulator tests are marked `@pytest.mark.sim` and excluded from `make test`.
+
+## Git and GitHub
+
+```sh
+git switch -c feature/<short-name> origin/<base>    # base is dev while it exists, otherwise main
+make check
+git commit -F msg.txt                                # long messages from a file, not -m
+git push -u origin feature/<short-name>              # asks first
+gh pr create --base <base> --title "..." --body-file pr.md   # body follows .github/pull_request_template.md
+gh pr checks --watch                                 # report failures; don't merge
+```
+
+A person merges. Never `gh pr merge`, never push to `main` or `dev`, never change repository settings.
 
 ## Work
 
-- Tasks are Trello cards. Each PR links its card in the description.
-- A task is done when the card's expected outcome and the Definition of Done in `CONTRIBUTING.md` are both met.
-- Work on a short-lived branch (`feature/`, `fix/`, `docs/`, `exp/`, `chore/`) and open a PR. Never commit to `main`.
+- Tasks are Trello cards. Each PR links its card.
+- Short-lived branches (`feature/`, `fix/`, `docs/`, `exp/`, `chore/`), small PRs. Never commit to `main` or `dev`.
+- Done means the card's expected outcome and the Definition of Done in `CONTRIBUTING.md` are met.
 
 ## Conventions
 
-- Planned layout: `missions/`, `verifier/`, `diversification/`, `attacks/`, `experiments/`, `scripts/`, `results/`, `docs/`, `tests/`.
-- The verifier returns PASS only with clear evidence, FAIL only with evidence of a violation, and INCONCLUSIVE when evidence is missing or unreadable. It never passes by default.
-- Tolerances and units come from configuration, not hard-coded numbers.
-- Seed all randomness. Every experiment writes a run record: commit, PX4 version, parameters, mission, seed, and the model and prompt for generated variants.
+- Layout: `missions/`, `harness/`, `verifier/`, `diversification/`, `attacks/`, `experiments/`, `scripts/`, `results/`, `docs/`, `tests/`. Create a directory when its first file lands.
+- Values that are guesses pending the team or sponsor (simulator, world, tolerances) go in one config file, marked `# placeholder:` with who decides. Don't bury guesses in code or present them as decided.
+- The verifier returns PASS only with clear evidence, FAIL only with evidence of a violation, INCONCLUSIVE otherwise. Tolerances come from the mission's requirements file, never from vehicle parameters.
+- Seed randomness. Every run writes a record beside its logs: git commit, PX4 commit, variant patch, config, seed, outcome.
 - Small sample logs live in `tests/fixtures/`. Raw logs and results don't go in git.
+- Containers publish ports on `127.0.0.1` only and don't use host networking (PX4's MAVLink has no authentication).
 
 ## Boundaries
 
 **Always**
-- Run the full check command before calling a task done, once it exists.
+- Run `make check` before calling a task done.
+- Say what you verified by running it and what you didn't.
 - Keep changes to the scope of the linked card.
-- Say what you're unsure about rather than guessing.
 
 **Ask first**
 - Adding or upgrading dependencies.
-- Changing the PX4 version, simulator setup, or mission definitions.
-- Changing verifier pass/fail criteria or tolerances.
-- Editing CI workflows, repo settings, or anything partner-facing.
-- Structural changes. These need an ADR in `docs/adr/` before code.
+- Changing the PX4 version, simulator setup, mission definitions, or verifier criteria.
+- Editing CI workflows or repo settings.
+- Structural changes (these need an ADR in `docs/adr/`).
+- Anything outside the repository, such as system config or global installs.
+- Pushing, merging, or calling `gh api`. Merges are done by a person.
 
 **Never**
-- Commit to `main`, force-push, or skip review.
+- Force-push, skip hooks (`--no-verify`), or commit to `main`/`dev`.
 - Edit or delete tests to make them pass.
-- Put credentials, `.env` contents, partner data, unpublished results, or meeting recordings into any prompt, external tool, or commit.
-- Run attack or failure-injection code anywhere except the local simulation.
+- Commit or paste into unapproved tools: credentials, `.env` contents, meeting notes, the local `handover/` folder, partner data, unpublished results.
+- Run attack or failure-injection code outside the simulation.
 - Commit large files or raw flight logs.
 
 ## Confidentiality
 
-What may go into which AI tools is set by the AI and Confidentiality section of the team charter. That section is being confirmed with our project partner. Until it is, treat Suresh's existing code, experiment results, and meeting content as restricted: use them only in tools the team has approved. Public PX4 docs, generic code, and error messages with paths and keys removed are fine anywhere.
+This repository is public. What may go into which AI tools follows the AI and Confidentiality section of the team charter; ask Luca (AI Coordinator) when unsure.
 
 ## To be added once code exists
 
 | What | Owner | When |
 |---|---|---|
-| Commands (install, test, lint, run a mission) | Gabriel | Sprint 1 (ADR 0001) |
-| Simulator setup pitfalls from reproducing the baseline missions | Brendon | Sprint 1 |
-| Module map and the conventions the code doesn't make obvious | Luca | After `docs/design.md` exists |
-| Rules for generating LLM variants (approved API and model, where prompts are stored, cost limits) | Luca | After the partner confirms approved tools |
-| Shared agent skills committed to the repo | Luca | Sprint 1 |
+| Environment commands (build, run a mission) | Gabriel | Environment PR |
+| Simulator pitfalls from reproducing the baseline missions | Brendon | After the first teammate cold start |
+| Module map and non-obvious conventions | Luca | After the harness and verifier exist |
+| Rules for generating LLM variants (approved model, prompt storage, cost limits) | Luca | After the partner confirms approved tools |

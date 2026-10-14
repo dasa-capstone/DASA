@@ -1,0 +1,5 @@
+# Developer tooling. Runtime dependencies (mavsdk, pyyaml, pyulog) are added by the environment PR.
+# Pins verified 2026-10-13; bump in a chore/ PR (Dependabot opens them).
+pytest==9.1.1
+ruff==0.16.8
+pre-commit==4.7.0

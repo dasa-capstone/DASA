@@ -1,0 +1,30 @@
+# Install once per clone with `make hooks`. CI runs the same hooks on every PR.
+# Bump pinned revs in their own chore/ PR (Dependabot opens them).
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=512", "--enforce-all"]  # flight logs and images stay out of git
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        exclude: '\.(patch|diff)$'  # variants are patches; whitespace in them is significant
+      - id: trailing-whitespace
+        exclude: '\.(patch|diff)$'
+      - id: no-commit-to-branch
+        args: ["--branch", "main", "--branch", "dev"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.8
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks  # staged changes only; CI scans full history separately
